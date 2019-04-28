@@ -1,0 +1,19 @@
+version: "3"
+services:
+  server:
+    image: wastes:${TAG}
+    ports:
+      - "8100:8100"
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 5s # wait for redis
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 30s
+    # environment:
+    # extra_hosts:
+  
