@@ -1,0 +1,42 @@
+# ${VAR}はenvsubstを使って環境変数に置き換えられる
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: main
+  labels:
+    name: main
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-deployment
+  namespace: main
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 0%
+  template:
+    metadata:
+      labels:
+        app: main-app
+    spec:
+      containers:
+      - image: asia.gcr.io/microwastes/main:${VERSION}
+        name: main
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-service
+  namespace: main
+spec:
+  type: LoadBalancer
+  selector:
+    app: main-app
+  ports:
+  - port: 8100
