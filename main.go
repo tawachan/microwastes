@@ -7,19 +7,35 @@ import (
 	"github.com/labstack/echo/middleware"
 )
 
+// RootResponse is type of response to root
+type RootResponse struct {
+	Message string `json:"message"`
+	Input   string `json:"input"`
+	Outout  string `json:"output"`
+}
+
 func main() {
-	// Echoのインスタンス作る
 	e := echo.New()
 
-	// 全てのリクエストで差し込みたいミドルウェア（ログとか）はここ
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// ルーティング
-	e.GET("/", func(c echo.Context) error { //c をいじって Request, Responseを色々する
-		return c.String(http.StatusOK, "root")
+	e.GET("/", func(c echo.Context) error {
+		input := c.QueryParam("input")
+		if input != "" {
+			return c.JSON(http.StatusOK, &RootResponse{
+				Message: "success",
+				Input:   input,
+				Outout:  "output",
+			})
+		} else {
+			return c.JSON(http.StatusBadRequest, &RootResponse{
+				Message: "no input detected",
+				Input:   "",
+				Outout:  "",
+			})
+		}
 	})
 
-	// サーバー起動
-	e.Start(":8100") //ポート番号指定してね
+	e.Start(":8100")
 }
